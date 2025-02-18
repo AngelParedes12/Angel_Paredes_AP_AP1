@@ -14,9 +14,6 @@ namespace Angel_Paredes_AP_AP1.Models
         [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "No se permiten números")]
         [Required(ErrorMessage = "El nombre es obligatorio")]
         [Display(Name = "Persona")]
-        public required string Persona { get; set; }
-
-        [Display(Name = "Observación")]
         public string? Observacion { get; set; }
 
         [Required(ErrorMessage = "El monto es obligatorio")]
