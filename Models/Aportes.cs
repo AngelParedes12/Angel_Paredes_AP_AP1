@@ -6,6 +6,10 @@ namespace Angel_Paredes_AP_AP1.Models
     {
         [Key]
         public int AporteId { get; set; }
+        
+
+        [Required(ErrorMessage = "La persona es obligatoria")]
+        public string Persona { get; set; } = string.Empty;
 
         [Required(ErrorMessage = "La fecha es obligatoria")]
         [Display(Name = "Fecha")]

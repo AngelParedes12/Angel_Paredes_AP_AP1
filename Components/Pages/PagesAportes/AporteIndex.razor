@@ -1,0 +1,112 @@
+﻿@page "/Aporte/Index"
+@rendermode InteractiveServer
+@inject AporteService aporteService
+@inject NavigationManager navigation
+
+<PageTitle>Aportes</PageTitle>
+
+<div class="container">
+    <div class="card shadow-lg">
+        @*Header*@
+        <div class="card-header bg-primary text-white text-center">
+            <h3><strong>Aportes</strong></h3>
+        </div>
+        <div class="row p-3">
+            <div class="col-md-5">
+                <label for="Filtro" class="form-label"><strong>Filtrar por:</strong></label>
+                <InputSelect id="filtro" class="form-select" @bind-Value="filtro">
+                    <option value="" disabled>Seleccionar</option>
+                    <option value="id">AporteId</option>
+                    <option value="Persona">Persona</option>
+                    <option value="Monto">Monto</option>
+                    <option value="Fecha">Fecha</option>
+                </InputSelect>
+            </div>
+            <div class="col-md-7">
+                <label for="ValorFiltro" class="form-label"><strong>B&uacute;squeda:</strong></label>
+                <div class="input-group">
+                    <input @bind="valorFiltro" class="form-control" placeholder="Buscar" />
+                    <button @onclick="Buscar" class="btn btn-primary" type="button">
+                        <span class="bi bi-search"></span> Buscar
+                    </button>
+                </div>
+            </div>
+
+            <div class="text-left">
+                <a href="/Aporte/Create" class="btn btn-success bi bi-plus-circle-fill"> Crear</a>
+            </div>
+        </div>
+        @*Body*@
+        <div class="card-body">
+            <table class="table table-bordered text-center">
+                <thead class="bg-primary text-white">
+                    <tr>
+                        <th>Aporte ID</th>
+                        <th>Persona</th>
+                        <th>Fecha</th>
+                        <th>Monto</th>
+                        <th>Observación</th>
+                        <th>Modificar</th>
+                        <th>Eliminar</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach (var aporte in aportes)
+                    {
+                        <tr>
+                            <td>@aporte.AporteId</td>
+                            <td>@aporte.Persona</td>
+                            <td>@aporte.Fecha.ToShortDateString()</td>
+                            <td>@aporte.Monto.ToString("C")</td>
+                            <td>@aporte.Observacion</td>
+                            <td class="text-center">
+                                <a href="/Aporte/Edit/@aporte.AporteId" class="btn btn-secondary bi bi-pencil-fill btn-radius"></a>
+                            </td>
+                            <td class="text-center">
+                                <a href="/Aporte/Delete/@aporte.AporteId" class="btn btn-danger bi bi-trash-fill btn-radius"></a>
+                            </td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+@code {
+    public List<Aportes> aportes = new List<Aportes>();
+    private string filtro = "";
+    private string valorFiltro = "";
+
+    protected override async Task OnInitializedAsync()
+    {
+        aportes = await aporteService.Listar(a => true);
+    }
+
+    private async Task Buscar()
+    {
+        if (!string.IsNullOrWhiteSpace(valorFiltro))
+        {
+            if (filtro == "id" && int.TryParse(valorFiltro, out int AporteId))
+            {
+                aportes = await aporteService.Listar(a => a.AporteId == AporteId);
+            }
+            else if (filtro == "Persona")
+            {
+                aportes = await aporteService.Listar(a => a.Persona.ToLower().Contains(valorFiltro.ToLower()));
+            }
+            else if (filtro == "Monto" && decimal.TryParse(valorFiltro, out decimal Monto))
+            {
+                aportes = await aporteService.Listar(a => a.Monto == Monto);
+            }
+            else if (filtro == "Fecha" && DateTime.TryParse(valorFiltro, out DateTime Fecha))
+            {
+                aportes = await aporteService.Listar(a => a.Fecha.Date == Fecha.Date);
+            }
+        }
+        else
+        {
+            aportes = await aporteService.Listar(a => true);
+        }
+    }
+}
